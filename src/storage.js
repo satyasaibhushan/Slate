@@ -14,8 +14,8 @@ function getClient() {
       : {}),
     region: requireEnv("S3_REGION", config.s3.region),
     credentials: {
-      accessKeyId: requireEnv("AWS_ACCESS_KEY_ID", config.s3.accessKeyId),
-      secretAccessKey: requireEnv("AWS_SECRET_ACCESS_KEY", config.s3.secretAccessKey)
+      accessKeyId: requireEnv("S3_ACCESS_KEY_ID", config.s3.accessKeyId),
+      secretAccessKey: requireEnv("S3_SECRET_ACCESS_KEY", config.s3.secretAccessKey)
     }
   });
 
