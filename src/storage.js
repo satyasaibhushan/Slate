@@ -6,10 +6,13 @@ let client;
 function getClient() {
   if (client) return client;
 
+  // AWS_ENDPOINT_URL is only for S3-compatible stores (R2, MinIO); plain AWS
+  // S3 needs no endpoint, and virtual-hosted style is the AWS default there.
   client = new S3Client({
-    endpoint: requireEnv("AWS_ENDPOINT_URL", config.s3.endpoint),
-    region: requireEnv("AWS_DEFAULT_REGION", config.s3.region),
-    forcePathStyle: config.s3.forcePathStyle,
+    ...(config.s3.endpoint
+      ? { endpoint: config.s3.endpoint, forcePathStyle: config.s3.forcePathStyle }
+      : {}),
+    region: requireEnv("S3_REGION", config.s3.region),
     credentials: {
       accessKeyId: requireEnv("AWS_ACCESS_KEY_ID", config.s3.accessKeyId),
       secretAccessKey: requireEnv("AWS_SECRET_ACCESS_KEY", config.s3.secretAccessKey)
@@ -20,10 +23,9 @@ function getClient() {
 }
 
 export function assertStorageConfigured() {
-  requireEnv("AWS_ENDPOINT_URL", config.s3.endpoint);
-  requireEnv("AWS_ACCESS_KEY_ID", config.s3.accessKeyId);
-  requireEnv("AWS_SECRET_ACCESS_KEY", config.s3.secretAccessKey);
-  requireEnv("AWS_S3_BUCKET_NAME", config.s3.bucketName);
+  requireEnv("S3_ACCESS_KEY_ID", config.s3.accessKeyId);
+  requireEnv("S3_SECRET_ACCESS_KEY", config.s3.secretAccessKey);
+  requireEnv("S3_BUCKET_NAME", config.s3.bucketName);
 }
 
 export async function putHtmlObject(key, html) {

@@ -58,11 +58,16 @@ curl -H "Authorization: Bearer $SLATE_API_KEY" https://slate.bhushan.fun/d/<draf
 | `SLATE_BOOTSTRAP_API_KEY` | yes | Seeds the single account + API key on boot |
 | `SLATE_PUBLIC_BASE_URL` | yes | e.g. `https://slate.bhushan.fun` (path-based draft URLs) |
 | `SLATE_SESSION_SECRET` | for web UI | HMAC secret for dashboard session cookies |
-| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | yes | S3 credentials |
-| `AWS_S3_BUCKET_NAME` | yes | Bucket for draft HTML objects |
-| `AWS_DEFAULT_REGION` | yes for AWS S3 | Bucket region |
-| `AWS_ENDPOINT_URL` | S3-compatible only | Leave unset for real AWS S3 |
+| `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` | yes | S3 credentials |
+| `S3_BUCKET_NAME` | yes | Bucket for draft HTML objects |
+| `S3_REGION` | yes | Bucket region |
+| `S3_ENDPOINT` | S3-compatible only | Leave unset for real AWS S3 |
 | `MAX_HTML_BYTES` | no | Upload size cap (default 512 KiB) |
+
+The `AWS_*` equivalents (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`,
+`AWS_S3_BUCKET_NAME`, `AWS_DEFAULT_REGION`, `AWS_ENDPOINT_URL`) also work as
+fallbacks, but on Vercel you must use the `S3_*` names — the Lambda runtime
+injects its own `AWS_*` credentials and Vercel reserves those names.
 
 ## Deploy (Vercel)
 
@@ -76,7 +81,7 @@ curl -H "Authorization: Bearer $SLATE_API_KEY" https://slate.bhushan.fun/d/<draf
 ```
 npm install
 DATABASE_URL=... SLATE_BOOTSTRAP_API_KEY=... SLATE_PUBLIC_BASE_URL=http://localhost:3000 \
-AWS_ACCESS_KEY_ID=... AWS_SECRET_ACCESS_KEY=... AWS_S3_BUCKET_NAME=... AWS_DEFAULT_REGION=... \
+S3_ACCESS_KEY_ID=... S3_SECRET_ACCESS_KEY=... S3_BUCKET_NAME=... S3_REGION=... \
 npm run dev
 ```
 
