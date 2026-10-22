@@ -1,0 +1,9 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Atlas search: Q4 rollout plan</title><style>body{margin:0;font:17px/1.6 ui-sans-serif,system-ui,sans-serif;color:#1d232b;background:#fbfaf7}main{max-width:760px;margin:56px auto;padding:0 24px}h1{font-size:38px;line-height:1.15;margin:0 0 6px}.meta{color:#6b7280;margin:0 0 28px}h2{font-size:20px;margin:32px 0 8px}table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid #e5e2da;padding:8px 6px;text-align:left}th{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:#6b7280}.tag{display:inline-block;padding:1px 8px;border-radius:99px;font-size:13px;background:#e8f1ea;color:#256b3a}.tag.risk{background:#fbeee4;color:#9a4b16}</style></head><body><main>
+<h1>Atlas search: Q4 rollout plan</h1><p class="meta">Draft for the platform review · fictional demo data</p>
+<h2>Goal</h2><p>Move every tenant from the legacy keyword index to the Atlas ranking service without a read outage.</p>
+<h2>Phases</h2><table><tr><th>Phase</th><th>Scope</th><th>Status</th></tr>
+<tr><td>1. Shadow reads</td><td>5% of queries, results compared offline</td><td><span class="tag">done</span></td></tr>
+<tr><td>2. Canary tenants</td><td>Three internal workspaces</td><td><span class="tag">done</span></td></tr>
+<tr><td>3. Regional cutover</td><td>EU first, then US</td><td><span class="tag risk">at risk</span></td></tr></table>
+<h2>Open questions</h2><p>Do we keep the legacy index warm for a week after cutover, or drop it once error rates hold for 48 hours?</p>
+</main></body></html>

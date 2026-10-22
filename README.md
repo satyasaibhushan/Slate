@@ -5,6 +5,15 @@ finished HTML page, gets back a stable URL, and can push new versions to the
 same URL later. Drafts are only readable by their owner (API key or web
 session) unless explicitly uploaded with `--public`.
 
+![Slate CLI uploading a draft twice, then the dashboard and the published page](docs/demo/demo.gif)
+
+The real CLI and web dashboard running against a local server with fictional
+drafts. [Watch the WebM](docs/demo/demo.webm) or see the
+[still](docs/demo/poster.png). Live site: <https://slate.bhushan.fun>.
+
+I built it so the HTML reports and plans my agents write have one link I can
+reopen after every revision, without making them public by accident.
+
 Slate is a fork of [postplan](https://github.com/t3dotgg/postplan) by t3dotgg
 (MIT). Differences from upstream:
 
@@ -50,6 +59,14 @@ Reading a private draft without the CLI:
 curl -H "Authorization: Bearer $SLATE_API_KEY" https://slate.bhushan.fun/d/<draft-id>/raw
 ```
 
+## Tech stack
+
+- Node 20+, Express 5, server-rendered HTML (no frontend build)
+- Postgres via `pg`, schema created on boot
+- S3 or any S3-compatible store for draft HTML (`@aws-sdk/client-s3`)
+- `parse5` for upload validation, `commander` for the CLI
+- Vercel serverless function in production (`api/index.js`)
+
 ## Environment variables
 
 | Variable | Required | Purpose |
@@ -86,6 +103,49 @@ npm run dev
 ```
 
 The schema is created/migrated automatically on boot.
+
+## Reproduce the demo
+
+The demo runs the real server, CLI, and dashboard with throwaway local
+services and the fictional drafts in `docs/demo/drafts/`. Needs Docker and
+Node 20+.
+
+```
+npm install
+docker run -d --name slate-demo-pg -e POSTGRES_PASSWORD=demo -e POSTGRES_DB=slate -p 127.0.0.1:55432:5432 postgres:16-alpine
+docker run -d --name slate-demo-s3 -p 127.0.0.1:59090:9090 adobe/s3mock
+curl -X PUT http://127.0.0.1:59090/slate-demo
+
+export DATABASE_URL=postgres://postgres:demo@127.0.0.1:55432/slate
+export SLATE_BOOTSTRAP_API_KEY=sl_demo_local_only_key SLATE_SESSION_SECRET=demo-only
+export SLATE_PUBLIC_BASE_URL=http://localhost:3911 PORT=3911
+export S3_ACCESS_KEY_ID=demo S3_SECRET_ACCESS_KEY=demo S3_BUCKET_NAME=slate-demo
+export S3_REGION=us-east-1 S3_ENDPOINT=http://127.0.0.1:59090
+npm start &
+
+npm install --prefix /tmp/slate-demo-deps playwright @xterm/xterm
+npx --prefix /tmp/slate-demo-deps playwright install chromium
+docs/demo/seed.sh /tmp/slate-demo/work
+DEMO_DEPS=/tmp/slate-demo-deps node docs/demo/capture.mjs /tmp/slate-demo/work
+docs/demo/encode.sh /tmp/slate-demo/work
+```
+
+`seed.sh` uploads two drafts through the CLI with an isolated `HOME`, so your
+real `~/.slate` is never touched. `capture.mjs` types and runs each CLI
+command for real, prints its actual output in xterm.js, then signs in to the
+dashboard. It writes `docs/demo/poster.png`; `encode.sh` writes
+`demo.webm` and `demo.gif`. The landing page at `/` plays the same files from
+`/demo/poster.png` and `/demo/demo.webm`.
+
+## Status and limitations
+
+- Version 0.1.0. Runs in production at <https://slate.bhushan.fun>.
+- One account, seeded from `SLATE_BOOTSTRAP_API_KEY`. Extra keys can be
+  minted from `/cli/auth`, but there is no multi-user sign-up.
+- Drafts are static. Scripts, forms, iframes, and cross-origin requests are
+  rejected on upload and blocked by the serving CSP.
+- Uploads are capped at 512 KiB by default (`MAX_HTML_BYTES`).
+- The CLI is not published to npm. Install from this repo (`npm link`).
 
 ## License
 

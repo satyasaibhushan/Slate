@@ -1,0 +1,6 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Index rebuild incident review</title><style>body{margin:0;font:17px/1.6 ui-sans-serif,system-ui,sans-serif;color:#1d232b;background:#fbfaf7}main{max-width:760px;margin:56px auto;padding:0 24px}h1{font-size:38px;line-height:1.15;margin:0 0 6px}.meta{color:#6b7280;margin:0 0 28px}h2{font-size:20px;margin:32px 0 8px}table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid #e5e2da;padding:8px 6px;text-align:left}th{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:#6b7280}.tag{display:inline-block;padding:1px 8px;border-radius:99px;font-size:13px;background:#e8f1ea;color:#256b3a}.tag.risk{background:#fbeee4;color:#9a4b16}</style></head><body><main>
+<h1>Index rebuild incident review</h1><p class="meta">Blameless write-up · fictional demo data</p>
+<h2>Summary</h2><p>A nightly rebuild ran against the primary instead of the replica. Search latency rose to 2.4 s for 38 minutes.</p>
+<h2>Timeline</h2><table><tr><th>Time</th><th>Event</th></tr><tr><td>02:10</td><td>Rebuild job starts on the wrong host</td></tr><tr><td>02:19</td><td>Latency alert fires</td></tr><tr><td>02:48</td><td>Job stopped, traffic recovers</td></tr></table>
+<h2>Follow-ups</h2><p>Pin the rebuild job to the replica role, and fail closed when the role tag is missing.</p>
+</main></body></html>

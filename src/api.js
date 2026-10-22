@@ -1,4 +1,5 @@
 import express from "express";
+import { fileURLToPath } from "node:url";
 import { contentHash, randomToken, sha256 } from "./crypto.js";
 import { config } from "./config.js";
 import { findApiKeyByToken, newEventId, pool, withTransaction } from "./db.js";
@@ -55,6 +56,18 @@ export function createApp() {
     } catch (error) {
       next(error);
     }
+  });
+
+  // The landing page's product preview. Only these two files are exposed;
+  // vercel.json includes them in the function bundle.
+  const demoAssets = new Map([
+    ["poster.png", fileURLToPath(new URL("../docs/demo/poster.png", import.meta.url))],
+    ["demo.webm", fileURLToPath(new URL("../docs/demo/demo.webm", import.meta.url))]
+  ]);
+  app.get("/demo/:file", (req, res, next) => {
+    const file = demoAssets.get(req.params.file);
+    if (!file || getDraftIdFromRequest(req)) return next();
+    res.sendFile(file, { headers: { "Cache-Control": "public, max-age=3600" } });
   });
 
   app.get("/healthz", async (req, res) => {
